@@ -42,16 +42,15 @@ showFullScreenIJKPlayer(
 }
 
 _showFullScreenWithRotateScreen(
-    BuildContext context,
-    IjkMediaController controller,
-    Widget customWidget,
-    ValueChanged<bool> onFullButton,
-    IJKControllerWidgetBuilder fullscreenControllerWidgetBuilder,
-    StatusWidgetBuilder statusWidgetBuilder,
-    {bool hideSystemBar,
-  void Function(bool enter) onFullscreen,}
-    ) async {
-
+  BuildContext context,
+  IjkMediaController controller,
+  Widget customWidget,
+  ValueChanged<bool> onFullButton,
+  IJKControllerWidgetBuilder fullscreenControllerWidgetBuilder,
+  StatusWidgetBuilder statusWidgetBuilder, {
+  bool hideSystemBar,
+  void Function(bool enter) onFullscreen,
+}) async {
   if (hideSystemBar) {
     IjkManager.showStatusBar(false);
   }
@@ -62,17 +61,17 @@ _showFullScreenWithRotateScreen(
         return IjkPlayer(
           mediaController: controller,
           statusWidgetBuilder: statusWidgetBuilder,
-           controllerWidgetBuilder: (ctl) {
-                return DefaultIJKControllerWidget(
-                  controller: controller,
-                  customWidget: customWidget,
-                  currentFullScreenState: true,
-                  onFullButton: onFullButton,
-                  fullscreenControllerWidgetBuilder: (ctl) {
-                    return fullscreenControllerWidgetBuilder(ctl);
-                  },
-                );
+          controllerWidgetBuilder: (ctl) {
+            return DefaultIJKControllerWidget(
+              controller: controller,
+              customWidget: customWidget,
+              currentFullScreenState: true,
+              onFullButton: onFullButton,
+              fullscreenControllerWidgetBuilder: (ctl) {
+                return fullscreenControllerWidgetBuilder(ctl);
               },
+            );
+          },
         );
       },
     ),
@@ -173,23 +172,26 @@ _showFullScreenWithRotateBox(
           }
         }*/
 
-        return SafeArea(
-          child: RotatedBox(
-            quarterTurns: quarterTurns,
-            child: IjkPlayer(
-              mediaController: controller,
-              statusWidgetBuilder: statusWidgetBuilder,
-              controllerWidgetBuilder: (ctl) {
-                return DefaultIJKControllerWidget(
-                  controller: controller,
-                  customWidget: customWidget,
-                  onFullButton: onFullButton,
-                  currentFullScreenState: true,
-                  fullscreenControllerWidgetBuilder: (ctl) {
-                    return fullscreenControllerWidgetBuilder(ctl);
-                  },
-                );
-              },
+        return _RotateBoxProvider(
+          quarterTurns: quarterTurns,
+          child: SafeArea(
+            child: RotatedBox(
+              quarterTurns: quarterTurns,
+              child: IjkPlayer(
+                mediaController: controller,
+                statusWidgetBuilder: statusWidgetBuilder,
+                controllerWidgetBuilder: (ctl) {
+                  return DefaultIJKControllerWidget(
+                    controller: controller,
+                    customWidget: customWidget,
+                    onFullButton: onFullButton,
+                    currentFullScreenState: true,
+                    fullscreenControllerWidgetBuilder: (ctl) {
+                      return fullscreenControllerWidgetBuilder(ctl);
+                    },
+                  );
+                },
+              ),
             ),
           ),
         );
@@ -215,4 +217,24 @@ Widget _buildFullScreenMediaController(
 
 Widget buildFullscreenMediaController(IjkMediaController controller) {
   return _buildFullScreenMediaController(controller, true);
+}
+
+class _RotateBoxProvider extends InheritedWidget {
+  final int quarterTurns;
+
+  _RotateBoxProvider({
+    @required this.quarterTurns,
+    @required Widget child,
+  }) : super(
+          child: child,
+        );
+
+  @override
+  bool updateShouldNotify(InheritedWidget oldWidget) {
+    return false;
+  }
+
+  static _RotateBoxProvider of(BuildContext context) {
+    return context.inheritFromWidgetOfExactType(_RotateBoxProvider);
+  }
 }
